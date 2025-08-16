@@ -1,4 +1,5 @@
-from ninja import Router
+from typing import Optional
+from ninja import File, Router, UploadedFile, Form
 from apps.accounts.auth import Authentication
 from apps.accounts.emails import EmailUtil
 from apps.accounts.models import Jwt, User
@@ -10,12 +11,15 @@ from apps.accounts.schemas import (
     SetNewPasswordSchema,
     TokenSchema,
     TokensResponseSchema,
+    UserResponseSchema,
+    UserSchema,
+    UserUpdateSchema,
     VerifyOtpSchema,
 )
 from apps.common.exceptions import ErrorCode, RequestError, ValidationError
 from apps.common.responses import CustomResponse
 from apps.common.schemas import ResponseSchema
-from apps.common.utils import AuthUser
+from apps.common.utils import AuthUser, set_dict_attr
 
 auth_router = Router(tags=["Auth"])
 
@@ -303,3 +307,40 @@ async def logout_all(request):
     user = request.auth
     await Jwt.objects.filter(user=user).adelete()
     return CustomResponse.success(message="Logout successful")
+
+
+# PROFILES
+profiles_router = Router(tags=["Profiles"])
+
+
+@profiles_router.get(
+    "",
+    summary="Get Profile",
+    description="""
+        This endpoint returns the profile of a user out from all devices.
+    """,
+    response=UserResponseSchema,
+    auth=AuthUser(),
+)
+async def get_user(request):
+    user = request.auth
+    return CustomResponse.success(message="Profile retrieved successfully", data=user)
+
+
+@profiles_router.put(
+    "",
+    summary="Update Profile",
+    description="""
+        This endpoint updates the profile of a user.
+    """,
+    response=UserResponseSchema,
+    auth=AuthUser(),
+)
+async def update_user(
+    request, data: Form[UserUpdateSchema], avatar: File[UploadedFile] = None
+):
+    user = request.auth
+    user = set_dict_attr(user, data.model_dump())
+    user.avatar = avatar
+    await user.asave()
+    return CustomResponse.success(message="Profile updated successfully", data=user)
