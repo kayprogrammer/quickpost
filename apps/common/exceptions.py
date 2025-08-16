@@ -12,6 +12,7 @@ class ErrorCode:
     EXPIRED_OTP = "expired_otp"
     INVALID_AUTH = "invalid_auth"
     INVALID_TOKEN = "invalid_token"
+    INVALID_CLIENT_ID = "invalid_client_id"
     INVALID_CREDENTIALS = "invalid_credentials"
     UNVERIFIED_USER = "unverified_user"
     NON_EXISTENT = "non_existent"
@@ -35,6 +36,17 @@ class RequestError(Exception):
         super().__init__()
 
 
+class ValidationError(RequestError):
+    """
+    For field errors that aren't controlled directly in the schemas but needs to be called or validated manually in the endpoints
+    """
+
+    def __init__(self, field, field_err_msg):
+        super().__init__(
+            ErrorCode.INVALID_ENTRY, "Invalid Entry", 422, {field: field_err_msg}
+        )
+
+
 def validation_errors(exc):
     details = exc.errors
     modified_details = {}
@@ -42,14 +54,10 @@ def validation_errors(exc):
         field_name = error["loc"][-1]
         err_msg = error["msg"]
         err_type = error["type"]
-        if err_type == "value_error.any_str.min_length":
-            err_msg = f"{error['ctx']['limit_value']} characters min"
-        elif err_type == "value_error.any_str.max_length":
-            err_msg = f"{error['ctx']['limit_value']} characters max"
-        elif err_type == "value_error.list.max_items":
-            err_msg = f"{error['ctx']['limit_value']} items max"
-        elif err_type == "value_error.list.min_items":
-            err_msg = f"{error['ctx']['limit_value']} item min"
+        if err_type == "string_too_short":
+            err_msg = f"{error['ctx']['min_length']} characters min"
+        elif err_type == "string_too_long":
+            err_msg = f"{error['ctx']['max_length']} characters max"
         elif err_type == "type_error.enum":
             allowed_enum_values = ", ".join(
                 [value.name for value in error["ctx"]["enum_values"]]

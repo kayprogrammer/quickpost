@@ -12,6 +12,7 @@ class User(AbstractBaseUser, BaseModel, PermissionsMixin):
     last_name = models.CharField(max_length=50)
     email = models.EmailField(verbose_name=(_("Email address")), unique=True)
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    social_avatar = models.CharField(max_length=1000, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -40,16 +41,14 @@ class User(AbstractBaseUser, BaseModel, PermissionsMixin):
         try:
             url = self.avatar.url
         except:
-            url = None
+            url = self.social_avatar  # from google
         return url
 
-    def check_expiration(self):
+    def is_otp_expired(self):
         if self.otp_expires_at:
             now = timezone.now()
-            diff = now - self.otp_expires_at
-            if diff.total_seconds() > int(settings.EMAIL_OTP_EXPIRE_SECONDS):
-                return True
-        return False
+            return now > self.otp_expires_at
+        return True
 
 
 class Jwt(BaseModel):

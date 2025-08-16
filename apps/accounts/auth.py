@@ -1,6 +1,11 @@
 from django.conf import settings
-from apps.accounts.models import Jwt
+from django.utils.crypto import get_random_string
+from apps.accounts.emails import EmailUtil
+from apps.accounts.models import Jwt, User
 from datetime import datetime, timedelta
+from apps.common.exceptions import ErrorCode
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 import jwt, random, string
 
 ALGORITHM = "HS256"
@@ -49,3 +54,34 @@ class Authentication:
         if not jwt_obj:
             return None
         return jwt_obj.user
+
+    def validate_google_token(auth_token):
+        """
+        validate method Queries the Google oAUTH2 api to fetch the user info
+        """
+        try:
+            idinfo = id_token.verify_oauth2_token(auth_token, google_requests.Request())
+            if not "sub" in idinfo.keys():
+                return None, ErrorCode.INVALID_TOKEN, "Invalid Google ID Token"
+            if idinfo["aud"] != settings.GOOGLE_CLIENT_ID:
+                return None, ErrorCode.INVALID_CLIENT_ID, "Invalid Client ID"
+            return idinfo, None, None
+        except:
+            return None, ErrorCode.INVALID_TOKEN, "Invalid Auth Token"
+
+    async def store_google_user(email: str, name: str, avatar: str = None):
+        user = await User.objects.aget_or_none(email=email)
+        if not user:
+            name = name.split()
+            first_name = name[0]
+            last_name = name[1]
+            user = await User.objects.acreate_user(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password=get_random_string(12),
+                social_avatar=avatar,
+                is_email_verified=True,
+            )
+            EmailUtil.welcome_email(user)
+        return user

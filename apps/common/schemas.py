@@ -1,12 +1,12 @@
-from ninja import Field, Schema as _Schema
+from ninja import Field, Schema
 
 
-class Schema(_Schema):
+class BaseSchema(Schema):
     class Config:
         arbitrary_types_allowed = True
 
         @staticmethod
-        def schema_extra(schema: dict, _):
+        def json_schema_extra(schema: dict, _):
             schema["properties"] = {
                 k: v
                 for k, v in schema.get("properties", {}).items()
@@ -14,7 +14,7 @@ class Schema(_Schema):
             }
 
 
-class ResponseSchema(Schema):
+class ResponseSchema(BaseSchema):
     status: str = "success"
     message: str
 
@@ -23,12 +23,12 @@ class ErrorResponseSchema(ResponseSchema):
     status: str = "failure"
 
 
-class PaginatedResponseDataSchema(Schema):
+class PaginatedResponseDataSchema(BaseSchema):
     per_page: int
     current_page: int
     last_page: int
 
 
-class UserDataSchema(Schema):
+class UserDataSchema(BaseSchema):
     name: str = Field(..., alias="full_name")
     avatar: str = Field(None, alias="avatar_url")
