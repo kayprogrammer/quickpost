@@ -1,4 +1,3 @@
-from typing import Optional
 from ninja import File, Router, UploadedFile, Form
 from apps.accounts.auth import Authentication
 from apps.accounts.emails import EmailUtil
@@ -12,7 +11,6 @@ from apps.accounts.schemas import (
     TokenSchema,
     TokensResponseSchema,
     UserResponseSchema,
-    UserSchema,
     UserUpdateSchema,
     VerifyOtpSchema,
 )
