@@ -1,4 +1,6 @@
-from typing import List, Optional
+from datetime import datetime
+from typing import List, Optional, Union
+from uuid import UUID
 from ninja import Field, FilterSchema, ModelSchema
 
 from apps.blog.models import Post
@@ -20,7 +22,7 @@ class PostCreateSchema(CommentCreateSchema):
     title: str = Field(..., max_length=200)
 
 
-# FILTER SCHEMAS
+# FILTER & PARAMETERS SCHEMAS
 class PostFilterSchema(FilterSchema):
     search: Optional[str] = Field(
         None,
@@ -33,12 +35,23 @@ class PostFilterSchema(FilterSchema):
     )
 
 
+class PaginationQuerySchema(BaseSchema):
+    page: int = Field(1, ge=1, description="Page number for pagination")
+    limit: int = Field(50, ge=1, le=100, description="Number of items per page")
+
+
 # RESPONSE SCHEMAS
-class PostSchema(ModelSchema):
+class BaseBlogSchema(BaseSchema):
+    id: UUID
     author: UserDataSchema
-    likes_count: int
-    dislikes_count: int
-    comments_count: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class PostSchema(BaseBlogSchema, ModelSchema):
+    likes_count: int = Field(0)
+    dislikes_count: int = Field(0)
+    comments_count: int = Field(0)
 
     class Meta:
         model = Post
@@ -53,27 +66,33 @@ class PostsResponseSchema(ResponseSchema):
     data: PaginatedPostsDataSchema
 
 
-class CommentSchema(ModelSchema):
-    author: UserDataSchema
+class PostResponseSchema(ResponseSchema):
+    data: PostSchema
+
+
+class CommentSchema(BaseBlogSchema):
     text: str
-    replies_count: int
+    replies_count: int = Field(0)
+    likes_count: int = Field(0)
+    dislikes_count: int = Field(0)
 
 
 class PaginatedCommentsDataSchema(PaginatedResponseDataSchema):
-    items: List[CommentSchema]
+    comments: List[CommentSchema] = Field(..., alias="items")
 
 
-class PostDetailWithCommentsDataSchema(PostSchema):
-    comments: PaginatedCommentsDataSchema
+class CommentsResponseSchema(ResponseSchema):
+    data: PaginatedCommentsDataSchema
 
 
-class PostDetailResponseSchema(ResponseSchema):
-    data: PostDetailWithCommentsDataSchema
+class CommentResponseSchema(ResponseSchema):
+    data: CommentSchema
 
 
-class ReplySchema(BaseSchema):
-    author: UserDataSchema
+class ReplySchema(BaseBlogSchema):
     text: str
+    likes_count: int = Field(0)
+    dislikes_count: int = Field(0)
 
 
 class PaginatedRepliesDataSchema(PaginatedResponseDataSchema):
@@ -84,5 +103,13 @@ class RepliesResponseSchema(ResponseSchema):
     data: PaginatedRepliesDataSchema
 
 
+class ReplyResponseSchema(ResponseSchema):
+    data: ReplySchema
+
+
 class PaginatedLikesSchema(PaginatedResponseDataSchema):
-    users: List[UserDataSchema]
+    users: List[Union[UserDataSchema, BaseBlogSchema]] = Field(..., alias="items")
+
+
+class LikesResponseSchema(ResponseSchema):
+    data: PaginatedLikesSchema

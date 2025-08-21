@@ -32,4 +32,16 @@ class Like(BaseModel):
     comment = models.ForeignKey(
         Comment, on_delete=models.CASCADE, related_name="likes", null=True, blank=True
     )
-    is_dislike = models.BooleanField(default=False)
+    is_disliked = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["author", "post"],
+                name="unique_like_per_user_post",
+            ),
+            models.UniqueConstraint(
+                fields=["author", "comment"],
+                name="unique_like_per_user_comment",
+            ),
+        ]

@@ -21,6 +21,7 @@ class ErrorCode:
     INVALID_VALUE = "invalid_value"
     NOT_ALLOWED = "not_allowed"
     INVALID_DATA_TYPE = "invalid_data_type"
+    INVALID_QUERY_PARAM = "invalid_query_param"
 
 
 class RequestError(Exception):
@@ -45,6 +46,15 @@ class ValidationError(RequestError):
         super().__init__(
             ErrorCode.INVALID_ENTRY, "Invalid Entry", 422, {field: field_err_msg}
         )
+
+
+class NotFoundError(RequestError):
+    """
+    For not found errors
+    """
+
+    def __init__(self, err_msg):
+        super().__init__(ErrorCode.NON_EXISTENT, err_msg, 404)
 
 
 def validation_errors(exc):

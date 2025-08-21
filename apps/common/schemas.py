@@ -24,6 +24,7 @@ class ErrorResponseSchema(ResponseSchema):
 
 
 class PaginatedResponseDataSchema(BaseSchema):
+    total: int
     per_page: int
     current_page: int
     last_page: int
