@@ -5,14 +5,6 @@ class BaseSchema(Schema):
     class Config:
         arbitrary_types_allowed = True
 
-        @staticmethod
-        def json_schema_extra(schema: dict, _):
-            schema["properties"] = {
-                k: v
-                for k, v in schema.get("properties", {}).items()
-                if not v.get("hidden", False)
-            }
-
 
 class ResponseSchema(BaseSchema):
     status: str = "success"

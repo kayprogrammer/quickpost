@@ -21,7 +21,8 @@ from apps.common.exceptions import ErrorCode, NotFoundError, RequestError
 from apps.common.paginators import CustomPagination
 from apps.common.responses import CustomResponse
 from apps.common.schemas import ResponseSchema
-from apps.common.utils import AuthUser, set_dict_attr
+from apps.common.utils import set_dict_attr
+from apps.common.auth import AuthUser
 
 blog_router = Router(tags=["Blog"])
 
@@ -57,7 +58,7 @@ async def get_posts(
 
 
 @blog_router.post(
-    "",
+    "/posts",
     summary="Create Post",
     description="""
         This endpoint allows an authenticated user to create a post.
@@ -205,7 +206,7 @@ async def create_comment(request, slug: str, data: CommentCreateSchema):
 
 
 @blog_router.get(
-    "/comments/{id}",
+    "/comments/{comment_id}",
     summary="Get a single post's comment",
     description="""
         This endpoint returns a single post comment
@@ -220,7 +221,7 @@ async def get_comment(request, comment_id: UUID):
 
 
 @blog_router.put(
-    "/comments/{id}",
+    "/comments/{comment_id}",
     summary="Update a Comment",
     description="""
         This endpoint allows an authenticated user to update his/her comment.
@@ -246,7 +247,7 @@ async def update_comment(request, comment_id: UUID, data: CommentCreateSchema):
 
 
 @blog_router.delete(
-    "/comments/{id}",
+    "/comments/{comment_id}",
     summary="Delete a Comment",
     description="""
         This endpoint allows an authenticated user to delete his/her comment.
@@ -393,7 +394,7 @@ async def delete_reply(request, reply_id: UUID):
 
 
 # ------------------------------------------------
-# LIKES ENDPOINTS
+# LIKES/DISLIKES ENDPOINTS
 # ------------------------------------------------
 @blog_router.get(
     "/likes/{obj_id}",
@@ -403,7 +404,7 @@ async def delete_reply(request, reply_id: UUID):
     """,
     response=LikesResponseSchema,
 )
-async def get_likes(
+async def get_likes_or_dislikes(
     request,
     obj_id: UUID,
     page_params: Query[PaginationQuerySchema],
@@ -422,16 +423,20 @@ async def get_likes(
     object_data = await model.objects.aget_or_none(id=obj_id, **extra_filter)
     if not object_data:
         raise NotFoundError(f"{data_type.capitalize()} not found")
-    likes = object_data.likes.select_related("author").filter(is_disliked=is_dislike)
-    paginated_data = await paginator.paginate_queryset(
-        likes, page_params.page, page_params.limit
+    likes_or_dislikes = object_data.likes.select_related("author").filter(
+        is_disliked=is_dislike
     )
-    return CustomResponse.success("Likes returned successfully", paginated_data)
+    paginated_data = await paginator.paginate_queryset(
+        likes_or_dislikes, page_params.page, page_params.limit
+    )
+    return CustomResponse.success(
+        "Likes/Dislikes returned successfully", paginated_data
+    )
 
 
-@blog_router.post(
-    "/likes/{obj_id}",
-    summary="Like or Dislike a Post / Comment / Reply",
+@blog_router.get(
+    "/likes/{obj_id}/toggle",
+    summary="Toggle Like or Dislike for a Post / Comment / Reply",
     description="""
         This endpoint allows an authenticated user to like or dislike a post, comment, or reply.  
         The obj_id represents the ID of the post, comment, or reply.
@@ -445,7 +450,7 @@ async def get_likes(
     response=ResponseSchema,
     auth=AuthUser(),
 )
-async def like_obj(
+async def like_or_dislike_toggle(
     request,
     obj_id: UUID,
     data_type: str = "post",

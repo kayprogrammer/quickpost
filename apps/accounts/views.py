@@ -17,7 +17,8 @@ from apps.accounts.schemas import (
 from apps.common.exceptions import ErrorCode, RequestError, ValidationError
 from apps.common.responses import CustomResponse
 from apps.common.schemas import ResponseSchema
-from apps.common.utils import AuthUser, set_dict_attr
+from apps.common.auth import AuthUser
+from apps.common.utils import set_dict_attr
 
 auth_router = Router(tags=["Auth"])
 

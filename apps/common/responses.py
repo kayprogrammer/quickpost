@@ -4,7 +4,6 @@ class CustomResponse:
             "status": "success",
             "message": message,
             "data": data,
-            "status_code": status_code,
         }
         if data is None:
             response.pop("data", None)

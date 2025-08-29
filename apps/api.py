@@ -10,7 +10,7 @@ from apps.common.exceptions import (
 
 from apps.accounts.views import auth_router, profiles_router
 from apps.blog.views import blog_router
-from apps.common.utils import AuthUser
+from apps.common.auth import AuthUser
 
 api = NinjaAPI(
     title="QuickPost API",

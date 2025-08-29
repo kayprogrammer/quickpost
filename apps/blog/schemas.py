@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional
 from uuid import UUID
 from ninja import Field, FilterSchema, ModelSchema
 
@@ -108,7 +108,7 @@ class ReplyResponseSchema(ResponseSchema):
 
 
 class PaginatedLikesSchema(PaginatedResponseDataSchema):
-    users: List[Union[UserDataSchema, BaseBlogSchema]] = Field(..., alias="items")
+    likes_or_dislikes: List[BaseBlogSchema] = Field(..., alias="items")
 
 
 class LikesResponseSchema(ResponseSchema):

@@ -1,4 +1,4 @@
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Q
 from apps.blog.models import Comment, Post
 
 
@@ -19,7 +19,7 @@ async def retrieve_post(slug: str, loaded: bool = True):
 
 async def retrieve_comment(comment_id: str, loaded: bool = True):
     """
-    Retrieve a comment by its slug.
+    Retrieve a comment by its id.
     """
     comment = Comment.objects.all()
     if loaded:
@@ -34,7 +34,7 @@ async def retrieve_comment(comment_id: str, loaded: bool = True):
 
 async def retrieve_reply(reply_id: str, loaded: bool = True):
     """
-    Retrieve a reply by its slug.
+    Retrieve a reply by its id.
     """
     reply = Comment.objects.all()
     if loaded:
