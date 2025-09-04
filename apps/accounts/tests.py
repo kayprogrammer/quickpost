@@ -1,7 +1,6 @@
-import json
+import json, pytest
 from unittest.mock import AsyncMock, patch
 from django.test import TestCase
-import pytest
 from apps.accounts.auth import Authentication
 from apps.common.exceptions import ErrorCode
 from apps.accounts.models import Jwt, User

@@ -108,7 +108,7 @@ async def update_post(
     user = request.auth
     post = await retrieve_post(slug)
     if not post:
-        raise NotFoundError.error("Post not found")
+        raise NotFoundError("Post not found")
 
     # Ensure the post belongs to the authenticated user
     if post.author_id != user.id:

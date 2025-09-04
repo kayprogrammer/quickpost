@@ -24,4 +24,4 @@ class PaginatedResponseDataSchema(BaseSchema):
 
 class UserDataSchema(BaseSchema):
     name: str = Field(..., alias="full_name")
-    avatar: str = Field(None, alias="avatar_url")
+    avatar: str | None = Field(None, alias="avatar_url")
