@@ -73,7 +73,7 @@ class TokensResponseSchema(ResponseSchema):
 
 
 class UserSchema(ModelSchema):
-    avatar_url: str | None = Field(None, alias="avatar_url")
+    avatar_url: str | None
 
     class Meta:
         model = User

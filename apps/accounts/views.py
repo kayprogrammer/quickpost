@@ -287,9 +287,11 @@ async def google_login(request, data: TokenSchema):
 )
 async def logout(request):
     user = request.auth
-    await Jwt.objects.filter(
-        user=user, access=request.META["HTTP_AUTHORIZATION"][7:]
-    ).adelete()
+    auth_header = request.META.get("HTTP_AUTHORIZATION") or request.META.get(
+        "HTTP_Authorization"
+    )
+    access_token = auth_header[7:] if auth_header else None
+    await Jwt.objects.filter(user=user, access=access_token).adelete()
     return CustomResponse.success(message="Logout successful")
 
 

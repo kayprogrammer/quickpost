@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils.crypto import get_random_string
 from apps.accounts.emails import EmailUtil
 from apps.accounts.models import Jwt, User
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from apps.common.exceptions import ErrorCode
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
@@ -18,7 +18,7 @@ class Authentication:
 
     # generate access token based and encode user's id
     def create_access_token(user_id):
-        expire = datetime.utcnow() + timedelta(
+        expire = datetime.now(UTC) + timedelta(
             minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         )
         to_encode = {"exp": expire, "user_id": str(user_id)}
@@ -27,7 +27,7 @@ class Authentication:
 
     # generate random refresh token
     def create_refresh_token():
-        expire = datetime.utcnow() + timedelta(
+        expire = datetime.now(UTC) + timedelta(
             minutes=int(settings.REFRESH_TOKEN_EXPIRE_MINUTES)
         )
         return jwt.encode(

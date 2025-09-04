@@ -1,9 +1,9 @@
 from ninja import Field, Schema
+from pydantic import ConfigDict
 
 
 class BaseSchema(Schema):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class ResponseSchema(BaseSchema):
