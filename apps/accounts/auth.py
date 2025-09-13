@@ -17,11 +17,11 @@ class Authentication:
         return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
     # generate access token based and encode user's id
-    def create_access_token(user_id):
+    def create_access_token(user: User):
         expire = datetime.now(UTC) + timedelta(
             minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         )
-        to_encode = {"exp": expire, "user_id": str(user_id)}
+        to_encode = {"exp": expire, "user_id": str(user.id), "role": user.role}
         encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 

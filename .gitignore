@@ -12,7 +12,6 @@ env/
 # Django stuff
 *.log
 db.sqlite3
-media/
 # OS files
 .DS_Store
 Thumbs.db
