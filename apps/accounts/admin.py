@@ -27,7 +27,7 @@ class UserAdmin(BaseUserAdmin):
         "is_staff",
         "is_active",
     ]
-    list_display_links = ["first_name", "last_name", "email"]
+    list_display_links = ["id", "first_name", "last_name", "email"]
     list_filter = [
         "first_name",
         "last_name",

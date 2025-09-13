@@ -9,6 +9,7 @@ cloudinary==1.44.1
 Django==5.2.5
 django-autoslug==1.9.9
 django-cloudinary-storage==0.3.0
+django-jazzmin==3.0.1
 django-ninja==1.4.3
 dnspython==2.7.0
 email_validator==2.2.0

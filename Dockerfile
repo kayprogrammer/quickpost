@@ -38,4 +38,4 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uvicorn", "quickpost.asgi:application", "--host", "0.0.0.0", "--port", "8000", "--reload"]

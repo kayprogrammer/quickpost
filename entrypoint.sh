@@ -11,6 +11,9 @@ echo "Database is ready!"
 echo "Running database migrations..."
 python manage.py migrate --noinput
 
+echo "Creating Initial test data..."
+python manage.py gen
+
 # Start the Django development server
 echo "Starting Django server..."
 exec "$@"

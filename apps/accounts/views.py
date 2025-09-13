@@ -203,7 +203,7 @@ async def login(request, data: LoginUserSchema):
         )
 
     # Create tokens and store in jwt model
-    access = Authentication.create_access_token(user)
+    access = Authentication.create_access_token(user.id)
     refresh = Authentication.create_refresh_token()
     await Jwt.objects.acreate(user=user, access=access, refresh=refresh)
 
@@ -234,7 +234,7 @@ async def refresh(request, data: TokenSchema):
         )
 
     user = await User.objects.aget(id=jwt.user_id)
-    access = Authentication.create_access_token(user)
+    access = Authentication.create_access_token(user.id)
     refresh = Authentication.create_refresh_token()
 
     jwt.access = access
@@ -266,7 +266,7 @@ async def google_login(request, data: TokenSchema):
         user_data["email"], user_data["name"], user_data["picture"]
     )
 
-    access = Authentication.create_access_token(user)
+    access = Authentication.create_access_token(user.id)
     refresh = Authentication.create_refresh_token()
     await Jwt.objects.acreate(user=user, access=access, refresh=refresh)
 

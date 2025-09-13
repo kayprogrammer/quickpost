@@ -1,12 +1,8 @@
 from django.contrib.auth.hashers import make_password
-import logging
 from django.core.management.base import BaseCommand
 
 from apps.accounts.models import User
 from apps.blog.models import Comment, Like, Post
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
