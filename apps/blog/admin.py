@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from apps.blog.models import Comment, Like, Post
 
+
 class PostAdmin(admin.ModelAdmin):
     list_display = ("id", "author", "title")
     list_filter = ("title",)
