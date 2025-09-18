@@ -22,6 +22,7 @@ class ErrorCode:
     NOT_ALLOWED = "not_allowed"
     INVALID_DATA_TYPE = "invalid_data_type"
     INVALID_QUERY_PARAM = "invalid_query_param"
+    RATE_LIMIT_EXCEEDED = "rate_limit_exceeded"
 
 
 class RequestError(Exception):

@@ -19,6 +19,7 @@ from apps.common.responses import CustomResponse
 from apps.common.schemas import ResponseSchema
 from apps.common.auth import AuthUser
 from apps.common.utils import set_dict_attr
+from ninja.throttling import AnonRateThrottle, AuthRateThrottle
 
 auth_router = Router(tags=["Auth"])
 
@@ -182,6 +183,7 @@ async def set_new_password(request, data: SetNewPasswordSchema):
         This endpoint generates new access and refresh tokens for authentication
     """,
     response={201: TokensResponseSchema},
+    throttle=AnonRateThrottle("5/m"),
 )
 async def login(request, data: LoginUserSchema):
     email = data.email
@@ -337,6 +339,7 @@ async def get_user(request):
     """,
     response=UserResponseSchema,
     auth=AuthUser(),
+    throttle=AuthRateThrottle("200/m"),
 )
 async def update_user(
     request, data: Form[UserUpdateSchema], avatar: File[UploadedFile] = None

@@ -1,6 +1,8 @@
 from ninja import NinjaAPI, Schema
 from ninja.responses import Response
-from ninja.errors import ValidationError, AuthenticationError
+from ninja.errors import ValidationError, AuthenticationError, Throttled
+from django.http import JsonResponse
+from django.utils.translation import gettext_lazy as _
 from apps.common.exceptions import (
     ErrorCode,
     RequestError,
@@ -56,3 +58,23 @@ def request_exc_handler(request, exc):
         },
         status=401,
     )
+
+
+@api.exception_handler(Throttled)
+def custom_throttled_handler(request, exc):
+    retry_after = int(exc.wait) if exc.wait else 0
+
+    response_data = {
+        "status": "failure",
+        "code": ErrorCode.RATE_LIMIT_EXCEEDED,
+        "message": _(
+            f"Rate limit exceeded. Please try again in {retry_after} seconds."
+        ),
+        "data": {
+            "retry_after": retry_after,
+        },
+    }
+
+    response = JsonResponse(response_data, status=429)
+    response["Retry-After"] = str(retry_after)  # industry standard header
+    return response
