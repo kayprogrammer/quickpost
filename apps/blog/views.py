@@ -17,6 +17,7 @@ from apps.blog.schemas import (
     ReplyResponseSchema,
 )
 from apps.blog.utils import retrieve_comment, retrieve_post, retrieve_reply
+from apps.common.cache import cacheable, invalidate_cache
 from apps.common.exceptions import ErrorCode, NotFoundError, RequestError
 from apps.common.paginators import CustomPagination
 from apps.common.responses import CustomResponse
@@ -40,6 +41,7 @@ paginator = CustomPagination()
     """,
     response=PostsResponseSchema,
 )
+@cacheable(key='posts:list:{{user_id}}', ttl=300)  # 5 minutes
 async def get_posts(
     request,
     page_params: Query[PaginationQuerySchema],
@@ -66,6 +68,7 @@ async def get_posts(
     response=PostResponseSchema,
     auth=AuthUser(),
 )
+@invalidate_cache(patterns=['posts:list:*'])  # Invalidate all post lists
 async def create_post(
     request, data: Form[PostCreateSchema], image: File[UploadedFile] = None
 ):
@@ -82,6 +85,7 @@ async def create_post(
     """,
     response=PostResponseSchema,
 )
+@cacheable(key='posts:detail:{{slug}}:{{user_id}}', ttl=600)  # 10 minutes
 async def get_post(
     request,
     slug: str,
@@ -101,6 +105,7 @@ async def get_post(
     response=PostResponseSchema,
     auth=AuthUser(),
 )
+@invalidate_cache(patterns=['posts:detail:{{slug}}:*', 'posts:list:*'])
 async def update_post(
     request, slug: str, data: Form[PostCreateSchema], image: File[UploadedFile] = None
 ):
@@ -132,6 +137,7 @@ async def update_post(
     response=ResponseSchema,
     auth=AuthUser(),
 )
+@invalidate_cache(patterns=['posts:detail:{{slug}}:*', 'posts:list:*', 'comments:post:{{slug}}:*'])
 async def delete_post(request, slug: str):
     user = request.auth
     post = await retrieve_post(slug, loaded=False)
@@ -160,6 +166,7 @@ async def delete_post(request, slug: str):
     """,
     response=CommentsResponseSchema,
 )
+@cacheable(key='comments:post:{{slug}}:{{user_id}}', ttl=120)  # 2 minutes
 async def get_comments(
     request, slug: str, page_params: Query[PaginationQuerySchema], sort: str = "asc"
 ):
@@ -196,6 +203,7 @@ async def get_comments(
     response=CommentResponseSchema,
     auth=AuthUser(),
 )
+@invalidate_cache(patterns=['comments:post:{{slug}}:*', 'posts:detail:{{slug}}:*'])
 async def create_comment(request, slug: str, data: CommentCreateSchema):
     user = request.auth
     post = await retrieve_post(slug, False)

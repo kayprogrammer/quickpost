@@ -95,6 +95,24 @@ DATABASES = {
 }
 
 
+# Cache Configuration
+# https://docs.djangoproject.com/en/5.2/topics/cache/
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{config('REDIS_HOST', default='127.0.0.1')}:{config('REDIS_PORT', default='6379')}/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "quickpost",
+        "TIMEOUT": 300,  # 5 minutes default
+    }
+}
+
+CACHE_KEY_PREFIX = "quickpost"
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -268,4 +286,43 @@ JAZZMIN_SETTINGS = {
         "auth.group": "vertical_tabs",
     },
     # "related_modal_active": True # Won't work in some browsers
+}
+
+# Structured Logging - No file logging, all to stdout for container environments
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "format": '{"level": "%(levelname)s", "timestamp": "%(asctime)s", "logger": "%(name)s", "message": "%(message)s", "module": "%(module)s"}',
+        },
+        "simple": {
+            "()": "logging.Formatter",
+            "format": "\033[32m%(levelname)s\033[0m:     \033[36m%(name)s\033[0m - %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+            "stream": "ext://sys.stdout",
+        },
+        "error_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+            "level": "ERROR",
+            "stream": "ext://sys.stderr",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console", "error_console"],
+        "level": "INFO",
+    },
 }
