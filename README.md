@@ -156,7 +156,7 @@ After completing this book, you'll be able to:
 - **1-on-1 author session**
 - **Priority support**
 
-**[Get Your Copy Now →](https://djangoninjabook.com)**
+**[Get Your Copy Now →](https://kenechiifeanyi.com/shop?product=django-ninja-in-action)**
 
 ## 👨‍💻 About the Author
 
@@ -167,7 +167,7 @@ After completing this book, you'll be able to:
 
 ## 📞 Support & Community
 
-- **Book Website**: [https://djangoninjabook.com](https://djangoninjabook.com)
+- **Book Website**: [https://djangoninjabook.com](https://kenechiifeanyi.com/shop?product=django-ninja-in-action)
 - **GitHub Issues**: [Report bugs or ask questions](https://github.com/kayprogrammer/quickpost/issues)
 - **Email Support**: [kenechiifeanyi@gmail.com](mailto:kenechiifeanyi@gmail.com)
 
@@ -181,4 +181,4 @@ The book content is protected by copyright. The accompanying source code (QuickP
 
 **Start your Django Ninja journey today!** 🚀
 
-[**📖 Purchase the Book**](https://djangoninjabook.com) | [**💻 View Source Code**](https://github.com/kayprogrammer/quickpost)
+[**📖 Purchase the Book**](https://kenechiifeanyi.com/shop?product=django-ninja-in-action) | [**💻 View Source Code**](https://github.com/kayprogrammer/quickpost)
